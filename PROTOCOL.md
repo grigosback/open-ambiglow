@@ -98,4 +98,6 @@ been located, and has not been needed: writing `0xC450` works regardless of mode
 
 - The mode selector (`effect_sel_SWMode` in the obfuscated assembly) and brightness
   register. Not required for direct colour control.
-- Whether the HDR white-lock overrides `0xC450` writes.
+- ~~Whether the HDR white-lock overrides `0xC450` writes.~~ It does not: verified
+  driving colour correctly with the monitor in HDR mode. The white-lock applies to the
+  firmware's own "Follow Video" effect, not to the LED buffer.

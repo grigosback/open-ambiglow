@@ -122,6 +122,8 @@ Verified on real hardware (34M2C8600 on Arch Linux + Hyprland):
 - ✅ LED geometry confirmed by lighting zones and individual LEDs
 - ✅ HyperHDR end to end at ~45 fps, PipeWire capture of a 10-bit HDR output
 - ✅ autostart via systemd user services
+- ✅ **works in HDR** — the firmware's HDR white-lock does not override `0xC450`,
+  so the glow tracks colour in HDR where the monitor's own Ambiglow goes white
 
 Not yet verified:
 
@@ -129,7 +131,6 @@ Not yet verified:
   nothing in [WINDOWS.md](WINDOWS.md) has been run on a Windows machine
 - ❓ **other models** — the 18 other layouts in `models.json` are transcribed from
   Philips' data file, never seen on hardware; their zone geometry may differ
-- ❓ whether the firmware's HDR white-lock overrides `0xC450`
 - ❓ the mode selector (`effect_sel_SWMode` in Philips' code) and the brightness
   register were never located; neither is needed for colour control
 
