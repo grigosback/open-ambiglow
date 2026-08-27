@@ -16,10 +16,37 @@ Writes straight into HyperHDR's SQLite settings (stop HyperHDR first), or
 prints the JSON with --print.
 """
 import argparse, json, os, sqlite3, sys, time
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.expanduser("~/.config/HyperHDR/db/hyperhdr.db")
 ZONE_ORDER = ["right", "rightup", "leftup", "left", "center", "bottom"]
+
+
+def db_candidates():
+    """Where HyperHDR keeps its settings.
+
+    It uses ~/.hyperhdr if that exists, else Qt's AppConfigLocation, with the
+    database at <path>/db/hyperhdr.db (sources/hyperhdr/main.cpp).
+    """
+    home = Path.home()
+    out = [home / ".hyperhdr" / "db" / "hyperhdr.db"]
+    if sys.platform == "win32":
+        for env in ("LOCALAPPDATA", "APPDATA"):
+            base = os.environ.get(env)
+            if base:
+                out.append(Path(base) / "HyperHDR" / "db" / "hyperhdr.db")
+    elif sys.platform == "darwin":
+        out.append(home / "Library" / "Preferences" / "HyperHDR" / "db" / "hyperhdr.db")
+    else:
+        out.append(home / ".config" / "HyperHDR" / "db" / "hyperhdr.db")
+    return out
+
+
+def find_db():
+    for c in db_candidates():
+        if c.exists():
+            return str(c)
+    return None
 
 
 def layout(model):
@@ -88,7 +115,8 @@ def main():
     ap.add_argument("--centre-bottom-first", action="store_true",
                     help="invert the centre bar if it runs upside down on your panel")
     ap.add_argument("--print", dest="dump", action="store_true", help="print JSON, write nothing")
-    ap.add_argument("--db", default=DB)
+    ap.add_argument("--db", default=None,
+                    help="path to hyperhdr.db (auto-detected if omitted)")
     a = ap.parse_args()
 
     leds = build(a.model, a.depth, a.centre_width, a.centre_bottom_first)
@@ -97,13 +125,15 @@ def main():
         print(json.dumps(leds, indent=1))
         return
 
-    if not os.path.exists(a.db):
-        sys.exit(f"no HyperHDR database at {a.db}")
-    c = sqlite3.connect(a.db)
+    db = a.db or find_db()
+    if not db or not os.path.exists(db):
+        tried = "\n  ".join(str(x) for x in db_candidates())
+        sys.exit(f"no HyperHDR database found. Tried:\n  {tried}\nPass --db explicitly.")
+    c = sqlite3.connect(db)
     c.execute("UPDATE settings SET config=?, updated_at=? WHERE type='leds' AND hyperhdr_instance=0",
               (json.dumps(leds), time.strftime("%Y-%m-%dT%H:%M:%SZ")))
     c.commit()
-    print(f"wrote {len(leds)} regions into {a.db} (restart HyperHDR)", file=sys.stderr)
+    print(f"wrote {len(leds)} regions into {db} (restart HyperHDR)", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -39,9 +39,12 @@ the engine overwrites within 50 ms.
 
 Full derivation, register map and disassembly notes: **[PROTOCOL.md](PROTOCOL.md)**.
 
+Works on Linux and Windows. The device is WCID, so Windows binds WinUSB to it
+automatically — no Zadig, no INF. See **[WINDOWS.md](WINDOWS.md)**.
+
 ## Requirements
 
-- Python 3 and `pyusb` (`pip install pyusb`)
+- Python 3 and `pyusb` (`pip install pyusb`; on Windows also `libusb-package`)
 - The monitor's **USB upstream cable connected to this machine**. DisplayPort alone is not
   enough — the MCU lives on the monitor's USB hub, and it disappears when that hub powers
   down.
