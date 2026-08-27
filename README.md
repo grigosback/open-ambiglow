@@ -52,12 +52,21 @@ Full derivation, register map and disassembly notes: **[PROTOCOL.md](PROTOCOL.md
 ```bash
 git clone https://github.com/grigosback/open-ambiglow
 cd open-ambiglow
-pip install -r requirements.txt
+pip install -r requirements.txt          # or: sudo pacman -S python-pyusb
+
+sudo groupadd -r ambiglow
+sudo usermod -aG ambiglow "$USER"
 sudo cp udev/99-evnia-ambiglow.rules /etc/udev/rules.d/
-sudo udevadm control --reload && sudo udevadm trigger
+sudo udevadm control --reload
+sudo udevadm trigger --action=add --subsystem-match=usb --attr-match=idVendor=0cf2
 ```
 
-Without the udev rule you need `sudo` for every call.
+Then **log out and back in** so your session picks up the new group. Until then you need
+`sudo` for every call.
+
+The rule sets `TAG+="uaccess"` as well, which grants the active seat user access on many
+setups — but that depends on logind tagging the device, which does not always happen for
+devices behind a hub, hence the group.
 
 ## HyperHDR
 
@@ -71,8 +80,8 @@ RGB byte stream, so a small bridge is enough:
 
 Then in HyperHDR: **LED hardware → udpraw**, `127.0.0.1:5568`, 46 LEDs.
 
-Setup details and an important caveat about screen capture under Wayland with HDR:
-**[HYPERHDR.md](HYPERHDR.md)**.
+Verified end to end on Arch + Hyprland at ~48 fps, including PipeWire capture of a 10-bit
+HDR output. Install notes, config, and LED layout: **[HYPERHDR.md](HYPERHDR.md)**.
 
 ## Supported models
 
@@ -94,6 +103,7 @@ left 3 | leftup 4 | center 18 | rightup 4 | right 3 | bottom 14
   needed for colour control, but it would let you stop the built-in effects cleanly
 - ❓ brightness register not identified
 - ❓ untested whether the firmware's HDR white-lock overrides `0xC450`
+- ✅ HyperHDR integration working (PipeWire capture -> udpraw -> bridge -> LEDs)
 
 ## Notes
 
