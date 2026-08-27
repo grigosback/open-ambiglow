@@ -9,7 +9,7 @@ edge, so it must not sample an edge. Geometry below is verified on a 34M2C8600:
     3 - 6    top edge, right corner -> toward centre
     7 - 10   top edge, centre -> left corner
     11 - 13  left edge, top -> bottom
-    14 - 31  centre bar, vertical, bottom -> top
+    14 - 31  centre bar, vertical, top -> bottom
     32 - 45  bottom edge, left -> right
 
 Writes straight into HyperHDR's SQLite settings (stop HyperHDR first), or
@@ -30,7 +30,7 @@ def layout(model):
     return {k: v for k, v in models[model].items() if k in ZONE_ORDER}
 
 
-def build(model, depth=0.10, centre_width=0.16):
+def build(model, depth=0.10, centre_width=0.16, centre_bottom_first=False):
     z = layout(model)
     leds = []
 
@@ -58,12 +58,16 @@ def build(model, depth=0.10, centre_width=0.16):
     for i in range(n):
         add(0, depth, i / n, (i + 1) / n)
 
-    # centre bar: vertical band through the middle of the frame, bottom -> top
+    # centre bar: vertical band through the middle of the frame.
+    # Verified on the 34M2C8600: the lowest index is the TOP of the bar.
     n = z.get("center", 0)
     if n:
         h0, h1 = 0.5 - centre_width / 2, 0.5 + centre_width / 2
         for i in range(n):
-            add(h0, h1, 1 - (i + 1) / n, 1 - i / n)
+            if centre_bottom_first:
+                add(h0, h1, 1 - (i + 1) / n, 1 - i / n)
+            else:
+                add(h0, h1, i / n, (i + 1) / n)
 
     # bottom edge, left -> right
     n = z.get("bottom", 0)
@@ -81,11 +85,13 @@ def main():
                     help="how far into the frame edge LEDs sample (0-0.5)")
     ap.add_argument("--centre-width", type=float, default=0.16,
                     help="width of the band the centre bar samples")
+    ap.add_argument("--centre-bottom-first", action="store_true",
+                    help="invert the centre bar if it runs upside down on your panel")
     ap.add_argument("--print", dest="dump", action="store_true", help="print JSON, write nothing")
     ap.add_argument("--db", default=DB)
     a = ap.parse_args()
 
-    leds = build(a.model, a.depth, a.centre_width)
+    leds = build(a.model, a.depth, a.centre_width, a.centre_bottom_first)
     print(f"{a.model}: {len(leds)} LED regions", file=sys.stderr)
     if a.dump:
         print(json.dumps(leds, indent=1))
