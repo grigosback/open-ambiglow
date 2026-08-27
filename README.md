@@ -113,15 +113,25 @@ centre section is a **vertical bar** on the back panel, not part of the top edge
 Check your own panel with `./ambiglow.py --identify` (each zone a distinct colour),
 `--led N RRGGBB` (one LED at a time), or `--walk` (steps through all of them).
 
-## Status and limitations
+## Status
 
-- ✅ per-LED colour control, verified on a 34M2C8600
+Verified on real hardware (34M2C8600 on Arch Linux + Hyprland):
+
+- ✅ per-LED colour control over USB
 - ✅ read access to the whole EC address space
-- ❓ the mode selector (`effect_sel_SWMode` in Philips' code) has not been located; not
-  needed for colour control, but it would let you stop the built-in effects cleanly
-- ❓ brightness register not identified
-- ❓ untested whether the firmware's HDR white-lock overrides `0xC450`
-- ✅ HyperHDR integration working (PipeWire capture -> udpraw -> bridge -> LEDs)
+- ✅ LED geometry confirmed by lighting zones and individual LEDs
+- ✅ HyperHDR end to end at ~45 fps, PipeWire capture of a 10-bit HDR output
+- ✅ autostart via systemd user services
+
+Not yet verified:
+
+- ❓ **Windows** — the device is WCID/WinUSB so the code should run unchanged, but
+  nothing in [WINDOWS.md](WINDOWS.md) has been run on a Windows machine
+- ❓ **other models** — the 18 other layouts in `models.json` are transcribed from
+  Philips' data file, never seen on hardware; their zone geometry may differ
+- ❓ whether the firmware's HDR white-lock overrides `0xC450`
+- ❓ the mode selector (`effect_sel_SWMode` in Philips' code) and the brightness
+  register were never located; neither is needed for colour control
 
 ## Notes
 
