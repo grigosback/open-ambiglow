@@ -16,7 +16,7 @@ from eneec import open_dev, read_regs, write_regs, DeviceNotFound, ADDR_SOURCE, 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_MODEL = "34M2C8600"
-ZONE_ORDER = ["left", "leftup", "center", "rightup", "right", "bottom"]
+ZONE_ORDER = ["right", "rightup", "leftup", "left", "center", "bottom"]
 
 
 def load_models():
@@ -66,6 +66,13 @@ def main():
                    help="colour one zone; repeatable")
     g.add_argument("--off", action="store_true", help="all LEDs off")
     g.add_argument("--get", action="store_true", help="print current colours by zone")
+    g.add_argument("--identify", action="store_true",
+                   help="paint each zone a distinct colour, to see which physical "
+                        "region each zone maps to")
+    g.add_argument("--led", nargs=2, action="append", metavar=("INDEX", "RRGGBB"),
+                   help="light one LED by index, everything else off; repeatable")
+    g.add_argument("--walk", nargs="?", const=1.0, type=float, metavar="SEC",
+                   help="light each LED in turn so you can map positions")
     ap.add_argument("--model", choices=sorted(models), help="override model detection")
     ap.add_argument("--hold", type=float, metavar="SEC",
                     help="revert to the previous colours after SEC seconds")
@@ -90,7 +97,40 @@ def main():
             print(f"  {name:<8} " + " ".join("%02x%02x%02x" % c for c in before[s:e]))
         return
 
-    if a.solid:
+    if a.walk is not None:
+        print(f"{model}: walking {nled} LEDs, {a.walk}s each. Ctrl-C to stop.")
+        try:
+            for i in range(nled):
+                zone = next((z for z, (s_, e_) in zones.items() if s_ <= i < e_), "?")
+                off = [(0, 0, 0)] * nled
+                off[i] = (255, 255, 255)
+                write_regs(d, ADDR_SOURCE, bytes(b for rgb in off for b in rgb))
+                print(f"  LED {i:2d}  ({zone})", flush=True)
+                time.sleep(a.walk)
+        except KeyboardInterrupt:
+            print("\nstopped")
+        write_regs(d, ADDR_SOURCE, before_raw)
+        print("restored")
+        return
+
+    if a.identify:
+        palette = {"left": (255, 0, 0), "leftup": (0, 255, 0), "center": (0, 0, 255),
+                   "rightup": (255, 255, 0), "right": (255, 0, 255), "bottom": (0, 255, 255)}
+        leds = [(0, 0, 0)] * nled
+        for zname, (s_, e_) in zones.items():
+            leds[s_:e_] = [palette.get(zname, (255, 255, 255))] * (e_ - s_)
+        print(f"{model}: zone identification -")
+        for zname, (s_, e_) in zones.items():
+            r, g_, b = palette.get(zname, (255, 255, 255))
+            print(f"  {zname:<8} LEDs {s_:2d}-{e_-1:<2d}  #{r:02X}{g_:02X}{b:02X}")
+    elif a.led:
+        leds = [(0, 0, 0)] * nled
+        for idx, col in a.led:
+            i = int(idx)
+            if not 0 <= i < nled:
+                raise SystemExit(f"LED index {i} out of range 0..{nled-1}")
+            leds[i] = parse_hex(col)
+    elif a.solid:
         leds = [parse_hex(a.solid)] * nled
     elif a.off:
         leds = [(0, 0, 0)] * nled

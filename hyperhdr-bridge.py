@@ -20,7 +20,7 @@ import eneec
 from eneec import read_regs, write_regs, DeviceNotFound, ADDR_SOURCE
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ZONE_ORDER = ["left", "leftup", "center", "rightup", "right", "bottom"]
+ZONE_ORDER = ["right", "rightup", "leftup", "left", "center", "bottom"]
 
 
 def led_count(model):

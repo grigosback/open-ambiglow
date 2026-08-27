@@ -77,8 +77,14 @@ engine renders it into `0xB8BC`/`0xBE5C` within ~50 ms.
 Do NOT write `0xB8BC` directly — the effect engine overwrites it within 50 ms.
 Writes there are accepted and verifiable on immediate readback, then lost.
 
-LED order is the zone order from `PCenter_AmbiglowInfo.json`:
-`left 3, leftup 4, center 18, rightup 4, right 3, bottom 14`.
+LED order is the **field order** in `PCenter_AmbiglowInfo.json`, which is
+`Right, RightUp, LeftUp, Left, Center, Bottom` — not alphabetical or left-to-right.
+For the 34M2C8600 that is `right 3, rightup 4, leftup 4, left 3, center 18, bottom 14`.
+Confirmed on hardware by lighting zones and individual LEDs.
+
+On this model `center` is a **vertical bar on the back panel**, not a top edge, and it
+runs bottom-to-top as the index rises (14 lowest, 31 highest). It should sample a central
+band of the frame rather than any screen edge.
 
 The engine applies a slight scale on render (`0xFF` source -> `0xFE` rendered), and
 LEDs at index 14..31 render at roughly 39% (`0x63` vs `0xFE`) — a fixed per-LED

@@ -89,11 +89,26 @@ HDR output. Install notes, config, and LED layout: **[HYPERHDR.md](HYPERHDR.md)*
 tested on real hardware — the rest are transcribed from the layout table shipped with
 Precision Center and should work, but reports are welcome.
 
-For the 34M2C8600 the 46 LEDs are ordered:
+**The buffer order is the field order in Philips' layout table**, not left-to-right:
 
 ```
-left 3 | leftup 4 | center 18 | rightup 4 | right 3 | bottom 14
+right 3 | rightup 4 | leftup 4 | left 3 | center 18 | bottom 14
 ```
+
+Verified physical geometry on a 34M2C8600 — the strip is one continuous path, and the
+centre section is a **vertical bar** on the back panel, not part of the top edge:
+
+```
+ 0 - 2    right edge, bottom -> up
+ 3 - 6    top edge, right corner -> toward centre
+ 7 - 10   top edge, centre -> left corner
+11 - 13   left edge, top -> bottom
+14 - 31   centre bar, vertical, bottom -> top
+32 - 45   bottom edge, left -> right
+```
+
+Check your own panel with `./ambiglow.py --identify` (each zone a distinct colour),
+`--led N RRGGBB` (one LED at a time), or `--walk` (steps through all of them).
 
 ## Status and limitations
 

@@ -39,19 +39,31 @@ with HyperHDR stopped. The keys that matter are `device` and `leds` for instance
 
 ## LED layout
 
-The physical order is Philips', not a normal clockwise ring. For the 34M2C8600:
+The buffer order is Philips' field order, and the centre section is a vertical bar on the
+back panel rather than part of the top edge. Verified on a 34M2C8600:
 
-    index  0.. 2   left      (3)
-    index  3.. 6   leftup    (4)
-    index  7..24   center    (18)
-    index 25..28   rightup   (4)
-    index 29..31   right     (3)
-    index 32..45   bottom    (14)
+     0 - 2    right edge, bottom -> up
+     3 - 6    top edge, right corner -> toward centre
+     7 - 10   top edge, centre -> left corner
+    11 - 13   left edge, top -> bottom
+    14 - 31   centre bar, vertical, bottom -> top
+    32 - 45   bottom edge, left -> right
 
-`leftup + center + rightup` together form the top edge. A sensible mapping is a clockwise
-loop: up the left edge, across the top, down the right edge, then right-to-left along the
-bottom. If your glow appears mirrored or rotated, reorder with the bridge's `--map` rather
-than fighting HyperHDR's layout editor.
+`hyperhdr-layout.py` generates matching sampling regions and writes them straight into
+HyperHDR's settings:
+
+```bash
+systemctl --user stop hyperhdr
+./hyperhdr-layout.py --model 34M2C8600
+systemctl --user start hyperhdr
+```
+
+`--depth` controls how far into the frame the edge LEDs sample; `--centre-width` sets the
+width of the central band the vertical bar samples. `--print` dumps the JSON instead of
+writing.
+
+To check the geometry on your own panel: `ambiglow.py --identify` lights each zone a
+distinct colour, `--led N RRGGBB` lights one LED, `--walk` steps through all of them.
 
 ## Running
 
