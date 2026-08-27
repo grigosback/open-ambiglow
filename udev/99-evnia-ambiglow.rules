@@ -1,0 +1,2 @@
+# Philips Evnia Ambiglow — ENE 6K7732 MCU inside the monitor
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0cf2", ATTRS{idProduct}=="a201", MODE="0660", TAG+="uaccess"

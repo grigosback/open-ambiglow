@@ -1,0 +1,22 @@
+{
+  "_comment": "Ambiglow LED layouts per model. Zone order is the physical order the MCU expects. Transcribed from the layout table shipped with Evnia Precision Center.",
+  "34M2C8600":   {"left": 3, "leftup": 4, "center": 18, "rightup": 4, "right": 3, "bottom": 14},
+  "34M2C7600MV": {"left": 3, "leftup": 4, "center": 22, "rightup": 4, "right": 3, "bottom": 14},
+  "34M2C6500":   {"left": 3, "leftup": 4, "center": 18, "rightup": 4, "right": 3, "bottom": 0},
+  "34M2C5501":   {"left": 4, "leftup": 5, "center": 0,  "rightup": 5, "right": 4, "bottom": 0},
+  "49M2C8900":   {"left": 3, "leftup": 9, "center": 20, "rightup": 9, "right": 3, "bottom": 0},
+  "49M2C8900L":  {"left": 3, "leftup": 9, "center": 20, "rightup": 9, "right": 3, "bottom": 0},
+  "42M2N8900":   {"left": 4, "leftup": 4, "center": 34, "rightup": 4, "right": 4, "bottom": 0},
+  "32M2N8900":   {"left": 4, "leftup": 5, "center": 24, "rightup": 5, "right": 4, "bottom": 0},
+  "32M2N8800":   {"left": 4, "leftup": 5, "center": 24, "rightup": 5, "right": 4, "bottom": 0},
+  "32M2N6800M":  {"left": 4, "leftup": 4, "center": 13, "rightup": 4, "right": 4, "bottom": 0},
+  "32M2N6800MW": {"left": 4, "leftup": 4, "center": 13, "rightup": 4, "right": 4, "bottom": 0},
+  "32M2N6800ML": {"left": 4, "leftup": 4, "center": 13, "rightup": 4, "right": 4, "bottom": 0},
+  "32M2N6800MD": {"left": 4, "leftup": 4, "center": 0,  "rightup": 4, "right": 4, "bottom": 0},
+  "27M2N8800":   {"left": 4, "leftup": 5, "center": 0,  "rightup": 5, "right": 4, "bottom": 0},
+  "27M2N8500":   {"left": 4, "leftup": 5, "center": 12, "rightup": 5, "right": 4, "bottom": 0},
+  "27M2N8500X":  {"left": 4, "leftup": 5, "center": 0,  "rightup": 5, "right": 4, "bottom": 0},
+  "27M2N6500":   {"left": 4, "leftup": 5, "center": 0,  "rightup": 5, "right": 4, "bottom": 0},
+  "27M2N6500P":  {"left": 4, "leftup": 5, "center": 0,  "rightup": 5, "right": 4, "bottom": 0},
+  "27M2N5900A":  {"left": 4, "leftup": 4, "center": 0,  "rightup": 4, "right": 4, "bottom": 0}
+}
