@@ -1,0 +1,16 @@
+[Unit]
+Description=HyperHDR ambient lighting
+Documentation=https://github.com/awawa-dev/HyperHDR
+# Must run inside the graphical session: the PipeWire/portal grabber cannot
+# get screen access from a system service.
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/hyperhdr
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

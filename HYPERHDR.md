@@ -71,15 +71,33 @@ distinct colour, `--led N RRGGBB` lights one LED, `--walk` steps through all of 
 ./hyperhdr-bridge.py --restore-on-exit
 ```
 
-`systemd/ambiglow-bridge.service` is a user unit for it:
+## Starting it automatically
+
+Both pieces run as **systemd user services**, bound to `graphical-session.target`.
+HyperHDR must run inside the graphical session — its PipeWire grabber cannot get screen
+access from a system service — so a user unit is the right shape for both.
 
 ```bash
-cp systemd/ambiglow-bridge.service ~/.config/systemd/user/
-systemctl --user enable --now ambiglow-bridge.service
+cp systemd/hyperhdr.service systemd/ambiglow-bridge.service ~/.config/systemd/user/
+# edit ExecStart in ambiglow-bridge.service if the repo is not at ~/Work/github/open-ambiglow
+systemctl --user daemon-reload
+systemctl --user enable hyperhdr.service ambiglow-bridge.service
 ```
 
-HyperHDR itself must run as a **user application inside the session** — its PipeWire
-grabber cannot get screen access from a system service. A `systemd --user` unit is fine.
+They then start on login and stop cleanly on logout, with the bridge restoring whatever
+the LEDs were showing beforehand.
+
+**After adding yourself to the `ambiglow` group you must log out and back in before the
+bridge service will work.** The `systemd --user` manager inherits your groups at login, so
+a session that predates the group cannot open the USB device — you will see
+`USBError: [Errno 13] Access denied` in `journalctl --user -u ambiglow-bridge`. Running
+the bridge by hand with `sudo -g ambiglow` works in the meantime.
+
+Check both after logging back in:
+
+```bash
+systemctl --user status hyperhdr ambiglow-bridge
+```
 
 ## Screen capture on Wayland
 

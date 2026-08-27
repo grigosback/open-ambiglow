@@ -1,12 +1,14 @@
 [Unit]
 Description=Ambiglow bridge (HyperHDR udpraw -> Philips Evnia LEDs)
+Documentation=https://github.com/grigosback/open-ambiglow
 After=graphical-session.target
+PartOf=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=%h/Work/github/open-ambiglow/hyperhdr-bridge.py --restore-on-exit --quiet
-Restart=on-failure
+Restart=always
 RestartSec=5
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
