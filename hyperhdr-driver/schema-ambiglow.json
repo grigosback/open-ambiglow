@@ -1,0 +1,42 @@
+{
+	"type":"object",
+	"required":true,
+	"properties":{
+		"vendorId" : {
+			"type": "integer",
+			"title":"edt_dev_spec_ambiglow_vid_title",
+			"default": 3314,
+			"minimum": 0,
+			"maximum": 65535,
+			"access": "expert",
+			"propertyOrder" : 1
+		},
+		"productId" : {
+			"type": "integer",
+			"title":"edt_dev_spec_ambiglow_pid_title",
+			"default": 41473,
+			"minimum": 0,
+			"maximum": 65535,
+			"access": "expert",
+			"propertyOrder" : 2
+		},
+		"address" : {
+			"type": "integer",
+			"title":"edt_dev_spec_ambiglow_address_title",
+			"default": 50256,
+			"minimum": 0,
+			"access": "expert",
+			"propertyOrder" : 3
+		},
+		"interface" : {
+			"type": "integer",
+			"title":"edt_dev_spec_ambiglow_interface_title",
+			"default": 0,
+			"minimum": 0,
+			"maximum": 255,
+			"access": "expert",
+			"propertyOrder" : 4
+		}
+	},
+	"additionalProperties": true
+}

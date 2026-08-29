@@ -83,9 +83,15 @@ devices behind a hub, hence the group.
 
 ## HyperHDR
 
-You can drive these LEDs from [HyperHDR](https://github.com/awawa-dev/HyperHDR) for real
-ambient lighting. HyperHDR has no driver for this MCU, but its `udpraw` output is a bare
-RGB byte stream, so a small bridge is enough:
+Two ways to drive these LEDs from [HyperHDR](https://github.com/awawa-dev/HyperHDR):
+
+**Native driver (no extra process).** `hyperhdr-driver/` holds a HyperHDR LED driver that
+talks to the monitor directly - it shows up in LED hardware as `ambiglow`. It needs a
+HyperHDR build, but then there is no bridge, no extra service and no separate USB
+permission setup. See [hyperhdr-driver/README.md](hyperhdr-driver/README.md).
+
+**Bridge (no rebuild).** HyperHDR's `udpraw` output is a bare RGB byte stream, so a small
+bridge is enough and works with stock HyperHDR:
 
 ```bash
 ./hyperhdr-bridge.py --restore-on-exit
