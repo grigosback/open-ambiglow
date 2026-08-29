@@ -74,6 +74,11 @@ ENELightNumbersData, SetLedGroupAll, SetLed_group, GetLightColors, ParameterLedS
 Write 138 bytes (46 RGB triplets) to **`0xC450`**. The value sticks, and the effect
 engine renders it into `0xB8BC`/`0xBE5C` within ~50 ms.
 
+**The monitor must be in Static Mode.** When the OSD selects an animated effect the
+firmware's engine produces its own frames and host writes to `0xC450` never reach the
+LEDs. In Static Mode the engine renders the host buffer instead. This is why finding the
+mode selector matters in practice, even though colour control does not need it.
+
 Do NOT write `0xB8BC` directly — the effect engine overwrites it within 50 ms.
 Writes there are accepted and verifiable on immediate readback, then lost.
 
@@ -97,7 +102,9 @@ been located, and has not been needed: writing `0xC450` works regardless of mode
 ## Still unknown
 
 - The mode selector (`effect_sel_SWMode` in the obfuscated assembly) and brightness
-  register. Not required for direct colour control.
+  register. Colour control does not need them, but being able to force Static Mode from
+  software would remove the one manual setup step and the most confusing failure mode.
+  `0xB22D` is not it - it reads back values other than those written.
 - ~~Whether the HDR white-lock overrides `0xC450` writes.~~ It does not: verified
   driving colour correctly with the monitor in HDR mode. The white-lock applies to the
   firmware's own "Follow Video" effect, not to the LED buffer.

@@ -99,6 +99,17 @@ Check both after logging back in:
 systemctl --user status hyperhdr ambiglow-bridge
 ```
 
+## If the LEDs ignore everything
+
+Check the monitor's OSD: **Ambiglow must be set to `Static Mode`**. In Rainbow or any
+other animated mode the firmware drives the LEDs itself and discards host writes, so the
+whole chain can be running perfectly with no visible effect.
+
+A second, subtler one: HyperHDR only transmits when the picture changes. On a still
+desktop it drops to a few packets per second, or none at all, and the LEDs hold their last
+colour. That looks like a dead pipeline but isn't - play a video to check. Setting
+`continuousOutput` in HyperHDR's smoothing config makes it send regardless.
+
 ## Screen capture on Wayland
 
 This works. On Hyprland 0.56.2 with a 10-bit HDR output

@@ -42,6 +42,16 @@ Full derivation, register map and disassembly notes: **[PROTOCOL.md](PROTOCOL.md
 Works on Linux and Windows. The device is WCID, so Windows binds WinUSB to it
 automatically — no Zadig, no INF. See **[WINDOWS.md](WINDOWS.md)**.
 
+## Set the monitor to Static Mode first
+
+**The monitor's OSD must have Ambiglow set to `Static Mode`.** In an animated mode
+(Rainbow, Colour Shift, Colour Wave, Colour Breathing, Follow Video) the firmware's own
+effect engine is generating frames, and it overwrites anything written from the host — the
+LEDs just keep running the built-in effect and nothing here appears to work.
+
+There is no known way to switch modes from software yet (see PROTOCOL.md), so this is a
+one-time setting on the monitor itself.
+
 ## Requirements
 
 - Python 3 and `pyusb` (`pip install pyusb`; on Windows also `libusb-package`)
