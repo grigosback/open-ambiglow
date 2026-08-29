@@ -2,26 +2,33 @@
 
 #ifndef PCH_ENABLED
 	#include <cstdint>
+	#include <vector>
 #endif
 
 #include <led-drivers/LedDevice.h>
 
 // Minimal libusb surface, resolved at runtime so libusb is not a build dependency
 // (same approach as ProviderSpiLibFtdi uses for libftdi).
+#ifdef _WIN32
+	#define AMBIGLOW_USB_CALL __cdecl
+#else
+	#define AMBIGLOW_USB_CALL
+#endif
+
 struct libusb_context;
 struct libusb_device_handle;
 
-typedef int   (*PTR_libusb_init)(libusb_context** ctx);
-typedef void  (*PTR_libusb_exit)(libusb_context* ctx);
-typedef libusb_device_handle* (*PTR_libusb_open_device_with_vid_pid)(libusb_context* ctx, uint16_t vid, uint16_t pid);
-typedef void  (*PTR_libusb_close)(libusb_device_handle* handle);
-typedef int   (*PTR_libusb_set_auto_detach_kernel_driver)(libusb_device_handle* handle, int enable);
-typedef int   (*PTR_libusb_claim_interface)(libusb_device_handle* handle, int interface_number);
-typedef int   (*PTR_libusb_release_interface)(libusb_device_handle* handle, int interface_number);
-typedef int   (*PTR_libusb_control_transfer)(libusb_device_handle* handle, uint8_t requestType, uint8_t request,
+typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_init)(libusb_context** ctx);
+typedef void  (AMBIGLOW_USB_CALL *PTR_libusb_exit)(libusb_context* ctx);
+typedef libusb_device_handle* (AMBIGLOW_USB_CALL *PTR_libusb_open_device_with_vid_pid)(libusb_context* ctx, uint16_t vid, uint16_t pid);
+typedef void  (AMBIGLOW_USB_CALL *PTR_libusb_close)(libusb_device_handle* handle);
+typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_set_auto_detach_kernel_driver)(libusb_device_handle* handle, int enable);
+typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_claim_interface)(libusb_device_handle* handle, int interface_number);
+typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_release_interface)(libusb_device_handle* handle, int interface_number);
+typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_control_transfer)(libusb_device_handle* handle, uint8_t requestType, uint8_t request,
 											 uint16_t value, uint16_t index, unsigned char* data,
 											 uint16_t length, unsigned int timeout);
-typedef const char* (*PTR_libusb_error_name)(int errcode);
+typedef const char* (AMBIGLOW_USB_CALL *PTR_libusb_error_name)(int errcode);
 
 ///
 /// Ambiglow LEDs built into Philips Evnia monitors.

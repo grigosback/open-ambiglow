@@ -25,7 +25,17 @@
 *  SOFTWARE.
  */
 
+#ifndef PCH_ENABLED
+	#include <cstring>
+#endif
+
 #ifdef _WIN32
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN
+	#endif
+	#ifndef NOMINMAX
+		#define NOMINMAX
+	#endif
 	#include <windows.h>
 #else
 	#include <dlfcn.h>
@@ -269,7 +279,7 @@ int DriverOtherAmbiglow::writeFiniteColors(const std::vector<ColorRgb>& ledValue
 	{
 		_frame.resize(wanted);
 	}
-	memcpy(_frame.data(), ledValues.data(), wanted);
+	std::memcpy(_frame.data(), ledValues.data(), wanted);
 
 	const int written = _fun_libusb_control_transfer(_deviceHandle,
 						REQ_TYPE_WRITE, REQ_WRITE,

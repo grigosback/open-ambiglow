@@ -1,49 +1,56 @@
-From 5cc344fe092f69845f362f473c2f04f5830fdd7f Mon Sep 17 00:00:00 2001
+From ab57547210cbdcd11fd24f4d75cac140d810ea65 Mon Sep 17 00:00:00 2001
 From: Lucas Mariano Grigolato <git@lucasgrigolato.dev>
 Date: Sat, 29 Aug 2026 15:31:19 +0200
 Subject: [PATCH] Add Ambiglow LED driver for Philips Evnia monitors
 
 ---
- .../led-drivers/other/DriverOtherAmbiglow.h   |  80 +++++
+ .../led-drivers/other/DriverOtherAmbiglow.h   |  87 +++++
  sources/led-drivers/LedDeviceSchemas.qrc      |   1 +
- .../led-drivers/other/DriverOtherAmbiglow.cpp | 292 ++++++++++++++++++
+ .../led-drivers/other/DriverOtherAmbiglow.cpp | 302 ++++++++++++++++++
  .../led-drivers/schemas/schema-ambiglow.json  |  42 +++
  www/i18n/en.json                              |   4 +
- 5 files changed, 419 insertions(+)
+ 5 files changed, 436 insertions(+)
  create mode 100644 include/led-drivers/other/DriverOtherAmbiglow.h
  create mode 100644 sources/led-drivers/other/DriverOtherAmbiglow.cpp
  create mode 100644 sources/led-drivers/schemas/schema-ambiglow.json
 
 diff --git a/include/led-drivers/other/DriverOtherAmbiglow.h b/include/led-drivers/other/DriverOtherAmbiglow.h
 new file mode 100644
-index 0000000..f104175
+index 0000000..3c9fc26
 --- /dev/null
 +++ b/include/led-drivers/other/DriverOtherAmbiglow.h
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,87 @@
 +#pragma once
 +
 +#ifndef PCH_ENABLED
 +	#include <cstdint>
++	#include <vector>
 +#endif
 +
 +#include <led-drivers/LedDevice.h>
 +
 +// Minimal libusb surface, resolved at runtime so libusb is not a build dependency
 +// (same approach as ProviderSpiLibFtdi uses for libftdi).
++#ifdef _WIN32
++	#define AMBIGLOW_USB_CALL __cdecl
++#else
++	#define AMBIGLOW_USB_CALL
++#endif
++
 +struct libusb_context;
 +struct libusb_device_handle;
 +
-+typedef int   (*PTR_libusb_init)(libusb_context** ctx);
-+typedef void  (*PTR_libusb_exit)(libusb_context* ctx);
-+typedef libusb_device_handle* (*PTR_libusb_open_device_with_vid_pid)(libusb_context* ctx, uint16_t vid, uint16_t pid);
-+typedef void  (*PTR_libusb_close)(libusb_device_handle* handle);
-+typedef int   (*PTR_libusb_set_auto_detach_kernel_driver)(libusb_device_handle* handle, int enable);
-+typedef int   (*PTR_libusb_claim_interface)(libusb_device_handle* handle, int interface_number);
-+typedef int   (*PTR_libusb_release_interface)(libusb_device_handle* handle, int interface_number);
-+typedef int   (*PTR_libusb_control_transfer)(libusb_device_handle* handle, uint8_t requestType, uint8_t request,
++typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_init)(libusb_context** ctx);
++typedef void  (AMBIGLOW_USB_CALL *PTR_libusb_exit)(libusb_context* ctx);
++typedef libusb_device_handle* (AMBIGLOW_USB_CALL *PTR_libusb_open_device_with_vid_pid)(libusb_context* ctx, uint16_t vid, uint16_t pid);
++typedef void  (AMBIGLOW_USB_CALL *PTR_libusb_close)(libusb_device_handle* handle);
++typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_set_auto_detach_kernel_driver)(libusb_device_handle* handle, int enable);
++typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_claim_interface)(libusb_device_handle* handle, int interface_number);
++typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_release_interface)(libusb_device_handle* handle, int interface_number);
++typedef int   (AMBIGLOW_USB_CALL *PTR_libusb_control_transfer)(libusb_device_handle* handle, uint8_t requestType, uint8_t request,
 +											 uint16_t value, uint16_t index, unsigned char* data,
 +											 uint16_t length, unsigned int timeout);
-+typedef const char* (*PTR_libusb_error_name)(int errcode);
++typedef const char* (AMBIGLOW_USB_CALL *PTR_libusb_error_name)(int errcode);
 +
 +///
 +/// Ambiglow LEDs built into Philips Evnia monitors.
@@ -114,10 +121,10 @@ index 562fd03..f66cfa9 100644
  		<file alias="schema-atmo">schemas/schema-atmo.json</file>
 diff --git a/sources/led-drivers/other/DriverOtherAmbiglow.cpp b/sources/led-drivers/other/DriverOtherAmbiglow.cpp
 new file mode 100644
-index 0000000..98030ea
+index 0000000..1c1f271
 --- /dev/null
 +++ b/sources/led-drivers/other/DriverOtherAmbiglow.cpp
-@@ -0,0 +1,292 @@
+@@ -0,0 +1,302 @@
 +/* DriverOtherAmbiglow.cpp
 +*
 +*  MIT License
@@ -145,7 +152,17 @@ index 0000000..98030ea
 +*  SOFTWARE.
 + */
 +
++#ifndef PCH_ENABLED
++	#include <cstring>
++#endif
++
 +#ifdef _WIN32
++	#ifndef WIN32_LEAN_AND_MEAN
++		#define WIN32_LEAN_AND_MEAN
++	#endif
++	#ifndef NOMINMAX
++		#define NOMINMAX
++	#endif
 +	#include <windows.h>
 +#else
 +	#include <dlfcn.h>
@@ -389,7 +406,7 @@ index 0000000..98030ea
 +	{
 +		_frame.resize(wanted);
 +	}
-+	memcpy(_frame.data(), ledValues.data(), wanted);
++	std::memcpy(_frame.data(), ledValues.data(), wanted);
 +
 +	const int written = _fun_libusb_control_transfer(_deviceHandle,
 +						REQ_TYPE_WRITE, REQ_WRITE,

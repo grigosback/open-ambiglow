@@ -40,6 +40,27 @@ The web resources step is needed because `cmake --install` does not place
 
 On a 12700K the whole build takes well under a minute.
 
+## Windows
+
+The driver is written to build and run on Windows, but **this has not been tested** - it
+was developed and verified on Linux only.
+
+What is verified: the MCU is a WCID device advertising compatible ID `WINUSB`, checked
+against the hardware. Windows therefore binds `winusb.sys` from the device's own
+descriptors, and libusb's Windows backend is WinUSB, so no Zadig and no driver replacement.
+
+What to expect when trying it:
+
+- **You must supply `libusb-1.0.dll`.** HyperHDR's Windows build does not ship it (its FTDI
+  path uses `ftd2xx` instead), so the driver's `LoadLibrary` will fail unless the DLL is on
+  `PATH` or next to `hyperhdr.exe`. Grab it from libusb's releases.
+- Close **Evnia Precision Center** first. It drives the same WinUSB interface, and two
+  processes cannot hold it at once.
+- The code has been kept MSVC-friendly: standard headers declared explicitly rather than
+  relying on the precompiled header, `windows.h` guarded with `WIN32_LEAN_AND_MEAN` and
+  `NOMINMAX`, and the libusb function pointers declared `__cdecl`. Those were real defects
+  in the first version that only compiled by luck on GCC.
+
 ## Configuration
 
 **LED hardware -> ambiglow**, LED count to match your panel (46 on the 34M2C8600).
