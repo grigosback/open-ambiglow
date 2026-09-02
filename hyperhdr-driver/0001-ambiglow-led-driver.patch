@@ -1,4 +1,4 @@
-From ab57547210cbdcd11fd24f4d75cac140d810ea65 Mon Sep 17 00:00:00 2001
+From 0a2cea86d8c1e92ad26cdc6919aa8e9961a0f931 Mon Sep 17 00:00:00 2001
 From: Lucas Mariano Grigolato <git@lucasgrigolato.dev>
 Date: Sat, 29 Aug 2026 15:31:19 +0200
 Subject: [PATCH] Add Ambiglow LED driver for Philips Evnia monitors

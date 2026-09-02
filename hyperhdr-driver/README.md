@@ -3,7 +3,7 @@
 A HyperHDR LED driver that talks to the monitor directly, so no bridge process is needed.
 It appears in **LED hardware** as **`ambiglow`**, under the USB/Serial group.
 
-Built and verified against HyperHDR master on Arch Linux, driving a 34M2C8600.
+Built and verified against **HyperHDR v22.0.0** on Arch Linux and Windows 11, driving a 34M2C8600.
 
 ## Why this exists
 
@@ -25,7 +25,7 @@ Driver files live in `led-drivers/other/`, which CMake globs automatically.
 ## Applying it
 
 ```bash
-git clone --recursive https://github.com/awawa-dev/HyperHDR
+git clone --recursive --branch v22.0.0.0 https://github.com/awawa-dev/HyperHDR
 cd HyperHDR
 git apply /path/to/0001-ambiglow-led-driver.patch
 cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -42,14 +42,13 @@ On a 12700K the whole build takes well under a minute.
 
 ## Windows
 
-The driver is written to build and run on Windows, but **this has not been tested** - it
-was developed and verified on Linux only.
+Tested and working on Windows 11 with HyperHDR v22.0.0.
 
-What is verified: the MCU is a WCID device advertising compatible ID `WINUSB`, checked
-against the hardware. Windows therefore binds `winusb.sys` from the device's own
-descriptors, and libusb's Windows backend is WinUSB, so no Zadig and no driver replacement.
+The MCU is a WCID device advertising compatible ID `WINUSB`, so Windows binds `winusb.sys`
+from the device's own descriptors - no Zadig and no driver replacement. libusb's Windows
+backend is WinUSB, so the same code runs unchanged.
 
-What to expect when trying it:
+Notes:
 
 - **You must supply `libusb-1.0.dll`.** HyperHDR's Windows build does not ship it (its FTDI
   path uses `ftd2xx` instead), so the driver's `LoadLibrary` will fail unless the DLL is on
